@@ -1,2 +1,2 @@
 export { Home } from "./Home";
-export { BMICalculator } from "./BMICalculator";
+export { Calculator } from "./Calculator";

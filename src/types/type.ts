@@ -11,9 +11,18 @@ export type errorTypes = {
 export type logsCardProps = {
   height: string;
   weight: string;
-  bmi: number;
-  category: string;
+  bmi?: number;
+  category?: string;
+  bmr?: number;
+  age?: number;
+  gender?: string;
+  exercise?: Array<number>;
   logs: Date;
+};
+
+export type cardPropsContainer = {
+  data: logsCardProps;
+  type: string;
 };
 
 export type BMIControlsProps = {
