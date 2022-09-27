@@ -1,10 +1,24 @@
 import { IonCard, IonCardContent, IonGrid, IonRow, IonCol, IonText } from "@ionic/react";
 import React from "react";
 import { cardPropsContainer } from "../../types/type";
+import "./ResultCard.css";
 
 const ResultCard: React.FC<cardPropsContainer> = (props: cardPropsContainer) => {
   return (
-    <IonCard>
+    <IonCard
+      className="result-card"
+      color={
+        props.type === "BMI"
+          ? props.data?.category === "Normal"
+            ? "success"
+            : props.data?.category === "Underweight" || props.data?.category === "Overweight"
+            ? "warning"
+            : props.data?.category === "Obese"
+            ? "danger"
+            : "primary"
+          : "primary"
+      }
+    >
       <IonCardContent>
         <IonGrid className="ion-text-center ion-margin">
           {props.type === "BMI" ? (

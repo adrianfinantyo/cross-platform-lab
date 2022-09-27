@@ -1,5 +1,18 @@
 import { Redirect, Route, Switch } from "react-router-dom";
-import { IonApp, IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonRouterOutlet, IonTitle, IonToolbar, setupIonicReact } from "@ionic/react";
+import {
+  IonApp,
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonPage,
+  IonRouterOutlet,
+  IonTitle,
+  IonToolbar,
+  setupIonicReact,
+} from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import * as Page from "./pages";
 
@@ -22,17 +35,28 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GlobalContext } from "./GlobalContext";
+import { sunny, moon } from "ionicons/icons";
 
 setupIonicReact();
 
 const App: React.FC = () => {
   const [title, setTitle] = useState<string>("Calculator");
+  const [darkMode, setDarkMode] = useState<boolean>(window.matchMedia("(prefers-color-scheme: dark)").matches);
+
   const globalContextValue = {
     title,
     setTitle,
   };
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   return (
     <GlobalContext.Provider value={globalContextValue}>
@@ -40,14 +64,19 @@ const App: React.FC = () => {
         <IonReactRouter>
           <IonPage>
             <IonHeader>
-              <IonToolbar style={{ padding: "0.5rem 2rem" }}>
+              <IonToolbar style={{ padding: "0.5rem 2rem" }} color="primary">
                 <IonButtons slot="start">
                   <IonBackButton defaultHref="/" />
                 </IonButtons>
                 <IonTitle>{title}</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setDarkMode(!darkMode)}>
+                    <IonIcon slot="icon-only" icon={darkMode ? moon : sunny} />
+                  </IonButton>
+                </IonButtons>
               </IonToolbar>
             </IonHeader>
-            <IonContent fullscreen className="ion-padding">
+            <IonContent className="ion-padding">
               <Switch>
                 <Route path="/bmi-calculator" exact render={() => <Page.Calculator type="BMI" />} />
                 <Route path="/bmr-calculator" exact render={() => <Page.Calculator type="BMR" />} />

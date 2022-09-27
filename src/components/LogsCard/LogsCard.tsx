@@ -4,7 +4,7 @@ import { cardPropsContainer } from "../../types/type";
 
 const LogsCard: React.FC<cardPropsContainer> = (props: cardPropsContainer) => {
   return (
-    <IonCard>
+    <IonCard color="primary">
       <IonCardContent>
         <IonGrid>
           {props.type === "BMR" && (

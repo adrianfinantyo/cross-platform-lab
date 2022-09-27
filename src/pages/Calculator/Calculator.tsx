@@ -63,11 +63,9 @@ const Calculator: React.FC<any> = ({ type }: { type: "BMI" | "BMR" }) => {
   }, [calcUnits]);
 
   const handleResetForm = () => {
-    console.log(getValues());
     reset();
     setValue("age", null);
     setValue("gender", null);
-    console.log(getValues());
   };
 
   const handleSubmitForm = (data: any) => {
@@ -129,136 +127,154 @@ const Calculator: React.FC<any> = ({ type }: { type: "BMI" | "BMR" }) => {
   };
 
   return (
-    <>
-      <form ref={formBMI}>
-        <IonGrid className="ion-text-center ion-margin">
-          <IonRow>
-            <IonCol>
-              <InputControls selectedValue={calcUnits} handleControl={setCalcUnits} />
-            </IonCol>
-          </IonRow>
-          {type === "BMR" && (
-            <>
+    <IonGrid>
+      <IonRow>
+        <IonCol size-sm="8" offset-sm="2" size-md="6" offset-md="3">
+          <form ref={formBMI}>
+            <IonGrid className="ion-text-center ion-no-padding">
+              <IonRow>
+                <IonCol>
+                  <InputControls selectedValue={calcUnits} handleControl={setCalcUnits} />
+                </IonCol>
+              </IonRow>
+              {type === "BMR" && (
+                <>
+                  <IonRow>
+                    <IonCol>
+                      <IonItem>
+                        <IonLabel position="floating">Age</IonLabel>
+                        <IonInput
+                          type="number"
+                          {...register("age", {
+                            required: {
+                              value: true,
+                              message: "Age is required",
+                            },
+                            min: {
+                              value: 0,
+                              message: "Age must be greater than 0",
+                            },
+                          })}
+                        />
+                      </IonItem>
+                      {errors.age && <IonText className="label label-danger ion-float-left">{errors.age.message}</IonText>}
+                    </IonCol>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol>
+                      <IonRow>
+                        <IonLabel>Gender</IonLabel>
+                      </IonRow>
+                      <Controller
+                        control={control}
+                        name="gender"
+                        rules={{
+                          required: {
+                            value: true,
+                            message: "Gender is required",
+                          },
+                        }}
+                        render={({ field: { onChange, value } }) => (
+                          <IonRadioGroup value={value} onIonChange={({ detail: { value } }) => onChange(value)}>
+                            <IonRow>
+                              <IonCol>
+                                <IonItem>
+                                  <IonRadio value="male" />
+                                  <IonLabel style={{ marginLeft: "0.8rem" }}>Male</IonLabel>
+                                </IonItem>
+                              </IonCol>
+                              <IonCol>
+                                <IonItem>
+                                  <IonRadio value="female" />
+                                  <IonLabel style={{ marginLeft: "0.8rem" }}>Female</IonLabel>
+                                </IonItem>
+                              </IonCol>
+                            </IonRow>
+                          </IonRadioGroup>
+                        )}
+                      />
+                      {errors.gender && <IonText className="label label-danger ion-float-left">{errors.gender.message}</IonText>}
+                    </IonCol>
+                  </IonRow>
+                </>
+              )}
               <IonRow>
                 <IonCol>
                   <IonItem>
-                    <IonLabel position="floating">Age</IonLabel>
+                    <IonLabel position="floating">Your Height ({calcUnits == "cmkg" ? "cm" : "ft"})</IonLabel>
                     <IonInput
                       type="number"
-                      {...register("age", {
+                      {...register("height", {
                         required: {
                           value: true,
-                          message: "Age is required",
+                          message: "Height is required",
                         },
                         min: {
-                          value: 0,
-                          message: "Age must be greater than 0",
+                          value: 1,
+                          message: "Height must be greater than 0",
                         },
                       })}
                     />
                   </IonItem>
-                  {errors.age && <IonText className="label label-danger ion-float-left">{errors.age.message}</IonText>}
+                  {errors.height && <IonText className="label label-danger ion-float-left">{errors.height.message}</IonText>}
                 </IonCol>
               </IonRow>
               <IonRow>
                 <IonCol>
-                  <IonRow>
-                    <IonLabel>Gender</IonLabel>
-                  </IonRow>
-                  <Controller
-                    control={control}
-                    name="gender"
-                    rules={{
-                      required: {
-                        value: true,
-                        message: "Gender is required",
-                      },
-                    }}
-                    render={({ field: { onChange, value } }) => (
-                      <IonRadioGroup value={value} onIonChange={({ detail: { value } }) => onChange(value)}>
-                        <IonRow>
-                          <IonCol>
-                            <IonItem>
-                              <IonRadio value="male" />
-                              <IonLabel style={{ marginLeft: "0.8rem" }}>Male</IonLabel>
-                            </IonItem>
-                          </IonCol>
-                          <IonCol>
-                            <IonItem>
-                              <IonRadio value="female" />
-                              <IonLabel style={{ marginLeft: "0.8rem" }}>Female</IonLabel>
-                            </IonItem>
-                          </IonCol>
-                        </IonRow>
-                      </IonRadioGroup>
-                    )}
-                  />
-                  {errors.gender && <IonText className="label label-danger ion-float-left">{errors.gender.message}</IonText>}
+                  <IonItem>
+                    <IonLabel position="floating">Your Weight ({calcUnits == "cmkg" ? "kg" : "lbs"})</IonLabel>
+                    <IonInput
+                      type="number"
+                      {...register("weight", {
+                        required: {
+                          value: true,
+                          message: "Weight is required",
+                        },
+                        min: {
+                          value: 1,
+                          message: "Weight must be greater than 0",
+                        },
+                      })}
+                    />
+                  </IonItem>
+                  {errors.weight && <IonText className="label label-danger ion-float-left">{errors.weight.message}</IonText>}
                 </IonCol>
               </IonRow>
-            </>
-          )}
+              <BMIControls onCalculate={handleSubmit(handleSubmitForm)} onReset={handleResetForm} />
+              <IonRow>
+                <IonCol>
+                  <ResultCard type={type} data={type === "BMI" ? logsBMI[logsBMI.length - 1] : logsBMR[logsBMR.length - 1]} />
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </form>
+        </IonCol>
+      </IonRow>
+      {logsBMR.length > 0 ||
+        (logsBMI.length > 0 && (
           <IonRow>
-            <IonCol>
-              <IonItem>
-                <IonLabel position="floating">Your Height ({calcUnits == "cmkg" ? "cm" : "ft"})</IonLabel>
-                <IonInput
-                  type="number"
-                  {...register("height", {
-                    required: {
-                      value: true,
-                      message: "Height is required",
-                    },
-                    min: {
-                      value: 1,
-                      message: "Height must be greater than 0",
-                    },
-                  })}
-                />
-              </IonItem>
-              {errors.height && <IonText className="label label-danger ion-float-left">{errors.height.message}</IonText>}
+            <IonCol size-sm="8" offset-sm="2" size-md="6" offset-md="3">
+              <h3 className="ion-text-center">{type} Logs</h3>
+              <IonGrid>
+                <IonRow>
+                  <IonCol>
+                    {type === "BMI"
+                      ? logsBMI
+                          ?.slice(0)
+                          .reverse()
+                          .map((item) => <LogsCard data={item} type="BMI" />)
+                      : type === "BMR" &&
+                        logsBMR
+                          ?.slice(0)
+                          .reverse()
+                          .map((item) => <LogsCard data={item} type="BMR" />)}
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
             </IonCol>
           </IonRow>
-          <IonRow>
-            <IonCol>
-              <IonItem>
-                <IonLabel position="floating">Your Weight ({calcUnits == "cmkg" ? "kg" : "lbs"})</IonLabel>
-                <IonInput
-                  type="number"
-                  {...register("weight", {
-                    required: {
-                      value: true,
-                      message: "Weight is required",
-                    },
-                    min: {
-                      value: 1,
-                      message: "Weight must be greater than 0",
-                    },
-                  })}
-                />
-              </IonItem>
-              {errors.weight && <IonText className="label label-danger ion-float-left">{errors.weight.message}</IonText>}
-            </IonCol>
-          </IonRow>
-          <BMIControls onCalculate={handleSubmit(handleSubmitForm)} onReset={handleResetForm} />
-          <IonRow>
-            <IonCol>
-              <ResultCard type={type} data={type === "BMI" ? logsBMI[logsBMI.length - 1] : logsBMR[logsBMR.length - 1]} />
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-      </form>
-      <h3 className="ion-text-center">{type} Logs</h3>
-      <IonGrid>
-        <IonRow>
-          <IonCol>
-            {type === "BMI"
-              ? logsBMI?.map((item) => <LogsCard data={item} type="BMI" />)
-              : type === "BMR" && logsBMR?.map((item) => <LogsCard data={item} type="BMR" />)}
-          </IonCol>
-        </IonRow>
-      </IonGrid>
-    </>
+        ))}
+    </IonGrid>
   );
 };
 

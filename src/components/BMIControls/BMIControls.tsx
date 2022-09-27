@@ -6,14 +6,14 @@ import { BMIControlsProps } from "../../types/type";
 const BMIControl: React.FC<BMIControlsProps> = (props: BMIControlsProps) => {
   return (
     <IonRow>
-      <IonCol>
-        <IonButton type="button" onClick={props.onCalculate}>
+      <IonCol size="12" size-md="6" className="ion-text-center">
+        <IonButton expand="block" color="success" type="button" onClick={props.onCalculate}>
           <IonIcon icon={calculatorOutline} />
           <IonText>Calculate</IonText>
         </IonButton>
       </IonCol>
-      <IonCol>
-        <IonButton type="button" onClick={props.onReset}>
+      <IonCol size="12" size-md="6" className="ion-text-center">
+        <IonButton fill="clear" color="medium" type="button" onClick={props.onReset}>
           <IonIcon icon={refreshOutline} />
           <IonText>Reset</IonText>
         </IonButton>
