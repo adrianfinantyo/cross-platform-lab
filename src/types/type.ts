@@ -1,36 +1,25 @@
-export type bmiValueTypes = {
-  value: number;
-  category: string;
+export type tabNavProps = {
+  tabItem: tabItemTypes[];
+  children: React.ReactNode;
 };
 
-export type errorTypes = {
-  isError: boolean;
+export type tabItemTypes = {
+  tabIcon: string;
+  tabLabel: string;
+  href: string;
+  tabBadge?: number;
+};
+
+export type mailResApi = {
+  from: string;
+  to: string;
+  subject: string;
   message: string;
+  date: string;
 };
 
-export type logsCardProps = {
-  height: string;
-  weight: string;
-  bmi?: number;
-  category?: string;
-  bmr?: number;
-  age?: number;
-  gender?: string;
-  exercise?: Array<number>;
-  logs: Date;
-};
-
-export type cardPropsContainer = {
-  data: logsCardProps;
-  type: string;
-};
-
-export type BMIControlsProps = {
-  onCalculate: () => void;
-  onReset: () => void;
-};
-
-export type inputControlsProps = {
-  selectedValue: "cmkg" | "ftlbs";
-  handleControl: (value: "cmkg" | "ftlbs") => void;
+export type contactResApi = {
+  name: string;
+  email: string;
+  avatar: string;
 };

@@ -1,2 +1,5 @@
 export { Home } from "./Home";
-export { Calculator } from "./Calculator";
+export { Meet } from "./Meet";
+export { Mail } from "./Mail";
+export { Spam } from "./Spam";
+export { Settings } from "./Settings";

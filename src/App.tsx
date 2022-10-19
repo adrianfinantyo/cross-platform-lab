@@ -1,4 +1,4 @@
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch, useLocation } from "react-router-dom";
 import {
   IonApp,
   IonBackButton,
@@ -7,6 +7,12 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonMenu,
+  IonMenuButton,
+  IonMenuToggle,
   IonPage,
   IonRouterOutlet,
   IonTitle,
@@ -37,17 +43,30 @@ import "./theme/variables.css";
 import "./App.css";
 import { useEffect, useState } from "react";
 import { GlobalContext } from "./GlobalContext";
-import { sunny, moon } from "ionicons/icons";
+import { sunny, moon, videocam, mail, list, warningOutline, settings } from "ionicons/icons";
+import { TabNav } from "./components/TabNav";
+import { tabItemTypes } from "./types/type";
 
 setupIonicReact();
 
 const App: React.FC = () => {
   const [title, setTitle] = useState<string>("Calculator");
   const [darkMode, setDarkMode] = useState<boolean>(window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const [displayMenu, setDisplayMenu] = useState<boolean>(true);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const toggleMenu = () => setDisplayMenu(!displayMenu);
 
   const globalContextValue = {
     title,
     setTitle,
+    menuButton: {
+      isDisplayed: displayMenu,
+      toggle: toggleMenu,
+    },
   };
 
   useEffect(() => {
@@ -62,28 +81,50 @@ const App: React.FC = () => {
     <GlobalContext.Provider value={globalContextValue}>
       <IonApp>
         <IonReactRouter>
-          <IonPage>
+          <IonMenu contentId="main-content" type="overlay">
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>IonMail</IonTitle>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="ion-padding">
+              <IonList>
+                {menuItem.map((menu) => (
+                  <IonMenuToggle key={menu.tabLabel}>
+                    <IonItem button routerLink={menu.href}>
+                      <IonIcon slot="start" icon={menu.tabIcon} />
+                      <IonLabel>{menu.tabLabel}</IonLabel>
+                    </IonItem>
+                  </IonMenuToggle>
+                ))}
+              </IonList>
+            </IonContent>
+          </IonMenu>
+          <IonPage id="main-content">
             <IonHeader>
               <IonToolbar style={{ padding: "0.5rem 2rem" }} color="primary">
-                <IonButtons slot="start">
-                  <IonBackButton defaultHref="/" />
-                </IonButtons>
+                <IonButtons slot="start">{displayMenu ? <IonMenuButton></IonMenuButton> : <IonBackButton defaultHref="/" />}</IonButtons>
                 <IonTitle>{title}</IonTitle>
                 <IonButtons slot="end">
-                  <IonButton onClick={() => setDarkMode(!darkMode)}>
+                  <IonButton onClick={toggleDarkMode}>
                     <IonIcon slot="icon-only" icon={darkMode ? moon : sunny} />
                   </IonButton>
                 </IonButtons>
               </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
-              <Switch>
-                <Route path="/bmi-calculator" exact render={() => <Page.Calculator type="BMI" />} />
-                <Route path="/bmr-calculator" exact render={() => <Page.Calculator type="BMR" />} />
-                <Route path="/" component={Page.Home} exact />
-                <Route path="/*" render={() => <Redirect to="/" />} />
-              </Switch>
-            </IonContent>
+            <TabNav tabItem={tabItem}>
+              <IonRouterOutlet>
+                <IonContent className="app-container">
+                  <Switch>
+                    <Route path="/mail" component={Page.Mail} exact />
+                    <Route path="/meet" component={Page.Meet} exact />
+                    <Route path="/mail/spam" component={Page.Spam} exact />
+                    <Route path="/settings" component={Page.Settings} exact />
+                    <Route path="/*" render={() => <Redirect to="/mail" />} />
+                  </Switch>
+                </IonContent>
+              </IonRouterOutlet>
+            </TabNav>
           </IonPage>
         </IonReactRouter>
       </IonApp>
@@ -92,3 +133,34 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+const tabItem: tabItemTypes[] = [
+  {
+    href: "/mail",
+    tabIcon: mail,
+    tabLabel: "Mail",
+  },
+  {
+    href: "/meet",
+    tabIcon: videocam,
+    tabLabel: "Meet",
+  },
+];
+
+const menuItem: tabItemTypes[] = [
+  {
+    href: "/mail",
+    tabIcon: mail,
+    tabLabel: "All Mail",
+  },
+  {
+    href: "/mail/spam",
+    tabIcon: warningOutline,
+    tabLabel: "Spam",
+  },
+  {
+    href: "/settings",
+    tabIcon: settings,
+    tabLabel: "Settings",
+  },
+];
