@@ -45,7 +45,7 @@ import { useEffect, useState } from "react";
 import { GlobalContext } from "./GlobalContext";
 import { sunny, moon, videocam, mail, list, warningOutline, settings } from "ionicons/icons";
 import { TabNav } from "./components/TabNav";
-import { tabItemTypes } from "./types/type";
+import { contactResApi, tabItemTypes } from "./types/type";
 
 setupIonicReact();
 
@@ -53,6 +53,7 @@ const App: React.FC = () => {
   const [title, setTitle] = useState<string>("Calculator");
   const [darkMode, setDarkMode] = useState<boolean>(window.matchMedia("(prefers-color-scheme: dark)").matches);
   const [displayMenu, setDisplayMenu] = useState<boolean>(true);
+  const [contact, setContact] = useState<contactResApi[]>([]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -66,6 +67,10 @@ const App: React.FC = () => {
     menuButton: {
       isDisplayed: displayMenu,
       toggle: toggleMenu,
+    },
+    contact: {
+      data: contact,
+      set: setContact,
     },
   };
 
