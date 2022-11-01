@@ -17,6 +17,7 @@ import {
   IonRouterOutlet,
   IonTitle,
   IonToolbar,
+  isPlatform,
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -41,36 +42,47 @@ import "@ionic/react/css/display.css";
 /* Theme variables */
 import "./theme/variables.css";
 import "./App.css";
-import { useEffect, useState } from "react";
-import { GlobalContext } from "./GlobalContext";
-import { sunny, moon, videocam, mail, list, warningOutline, settings } from "ionicons/icons";
+import { useContext, useEffect, useState } from "react";
+import { GlobalContext } from "./context/GlobalContext";
+import { sunny, moon, videocam, mail, list, warningOutline, settings, happyOutline, sadOutline, happy, sad, add } from "ionicons/icons";
 import { TabNav } from "./components/TabNav";
-import { contactResApi, tabItemTypes } from "./types/type";
+import { tabItemTypes } from "./types/type";
+import { MemoryContext } from "./context/MemoryContext";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [title, setTitle] = useState<string>("Calculator");
+  const [title, setTitle] = useState<string>("Memories App");
   const [darkMode, setDarkMode] = useState<boolean>(window.matchMedia("(prefers-color-scheme: dark)").matches);
-  const [displayMenu, setDisplayMenu] = useState<boolean>(true);
-  const [contact, setContact] = useState<contactResApi[]>([]);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
-
-  const toggleMenu = () => setDisplayMenu(!displayMenu);
+  const [iosAddButton, setIosAddButton] = useState<boolean>(false);
+  const [themeButton, setThemeButton] = useState<boolean>(true);
+  const [showBackBtn, setShowBackBtn] = useState<boolean>(false);
+  const { initContext } = useContext(MemoryContext);
 
   const globalContextValue = {
-    title,
-    setTitle,
-    menuButton: {
-      isDisplayed: displayMenu,
-      toggle: toggleMenu,
+    title: {
+      value: title,
+      set: setTitle,
     },
-    contact: {
-      data: contact,
-      set: setContact,
+    darkMode: {
+      value: darkMode,
+      set: (value: boolean) => setDarkMode(value),
+      toggle: () => setDarkMode(!darkMode),
+    },
+    backButton: {
+      value: showBackBtn,
+      set: (value: boolean) => setShowBackBtn(value),
+      toggle: () => setShowBackBtn(!showBackBtn),
+    },
+    iosAddButton: {
+      value: iosAddButton,
+      set: (value: boolean) => setIosAddButton(value),
+      toggle: () => setIosAddButton(!iosAddButton),
+    },
+    themeButton: {
+      value: themeButton,
+      set: (value: boolean) => setThemeButton(value),
+      toggle: () => setThemeButton(!themeButton),
     },
   };
 
@@ -82,54 +94,62 @@ const App: React.FC = () => {
     }
   }, [darkMode]);
 
+  useEffect(() => {
+    initContext();
+  }, []);
+
   return (
     <GlobalContext.Provider value={globalContextValue}>
       <IonApp>
         <IonReactRouter>
-          <IonMenu contentId="main-content" type="overlay">
+          <IonPage>
             <IonHeader>
-              <IonToolbar>
-                <IonTitle>IonMail</IonTitle>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent className="ion-padding">
-              <IonList>
-                {menuItem.map((menu) => (
-                  <IonMenuToggle key={menu.tabLabel}>
-                    <IonItem button routerLink={menu.href}>
-                      <IonIcon slot="start" icon={menu.tabIcon} />
-                      <IonLabel>{menu.tabLabel}</IonLabel>
-                    </IonItem>
-                  </IonMenuToggle>
-                ))}
-              </IonList>
-            </IonContent>
-          </IonMenu>
-          <IonPage id="main-content">
-            <IonHeader>
-              <IonToolbar style={{ padding: "0.5rem 2rem" }} color="primary">
-                <IonButtons slot="start">{displayMenu ? <IonMenuButton></IonMenuButton> : <IonBackButton defaultHref="/" />}</IonButtons>
+              <IonToolbar style={{ padding: "0.5rem" }} color="primary">
+                {showBackBtn ? (
+                  <IonButtons slot="start">
+                    <IonBackButton defaultHref="/memories" />
+                  </IonButtons>
+                ) : (
+                  isPlatform("ios") && (
+                    <IonButton slot="start" onClick={() => setDarkMode(!darkMode)}>
+                      <IonIcon slot="icon-only" icon={darkMode ? moon : sunny} />
+                    </IonButton>
+                  )
+                )}
                 <IonTitle>{title}</IonTitle>
                 <IonButtons slot="end">
-                  <IonButton onClick={toggleDarkMode}>
-                    <IonIcon slot="icon-only" icon={darkMode ? moon : sunny} />
-                  </IonButton>
+                  {isPlatform("ios") && iosAddButton ? (
+                    <IonButton routerLink="/new-memories">
+                      <IonIcon slot="icon-only" icon={add} />
+                    </IonButton>
+                  ) : (
+                    themeButton && (
+                      <IonButton onClick={() => setDarkMode(!darkMode)}>
+                        <IonIcon slot="icon-only" icon={darkMode ? moon : sunny} />
+                      </IonButton>
+                    )
+                  )}
                 </IonButtons>
               </IonToolbar>
             </IonHeader>
-            <TabNav tabItem={tabItem}>
-              <IonRouterOutlet>
-                <IonContent className="app-container">
-                  <Switch>
-                    <Route path="/mail" component={Page.Mail} exact />
-                    <Route path="/meet" component={Page.Meet} exact />
-                    <Route path="/mail/spam" component={Page.Spam} exact />
-                    <Route path="/settings" component={Page.Settings} exact />
-                    <Route path="/*" render={() => <Redirect to="/mail" />} />
-                  </Switch>
-                </IonContent>
-              </IonRouterOutlet>
-            </TabNav>
+            <IonRouterOutlet>
+              <IonContent className="app-container ion-padding">
+                <Switch>
+                  <Route path="/new-memories" exact component={Page.NewMemories} />
+                  <Route path="/memories/:path1?" exact>
+                    <TabNav tabItem={tabItem}>
+                      <IonRouterOutlet>
+                        <IonContent className="app-container ion-padding">
+                          <Route path="/memories/:type" component={Page.Memories} />
+                          <Redirect exact from="/memories" to="/memories/good" />
+                        </IonContent>
+                      </IonRouterOutlet>
+                    </TabNav>
+                  </Route>
+                  <Redirect exact from="/*" to="/memories" />
+                </Switch>
+              </IonContent>
+            </IonRouterOutlet>
           </IonPage>
         </IonReactRouter>
       </IonApp>
@@ -141,31 +161,13 @@ export default App;
 
 const tabItem: tabItemTypes[] = [
   {
-    href: "/mail",
-    tabIcon: mail,
-    tabLabel: "Mail",
+    href: "/memories/good",
+    tabIcon: happy,
+    tabLabel: "Good Memories",
   },
   {
-    href: "/meet",
-    tabIcon: videocam,
-    tabLabel: "Meet",
-  },
-];
-
-const menuItem: tabItemTypes[] = [
-  {
-    href: "/mail",
-    tabIcon: mail,
-    tabLabel: "All Mail",
-  },
-  {
-    href: "/mail/spam",
-    tabIcon: warningOutline,
-    tabLabel: "Spam",
-  },
-  {
-    href: "/settings",
-    tabIcon: settings,
-    tabLabel: "Settings",
+    href: "/memories/bad",
+    tabIcon: sad,
+    tabLabel: "Bad Memories",
   },
 ];

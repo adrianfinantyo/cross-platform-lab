@@ -1,0 +1,12 @@
+.image-preview {
+  width: 100%;
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+}
+
+body.dark .image-preview {
+  border: 1px solid grey;
+}

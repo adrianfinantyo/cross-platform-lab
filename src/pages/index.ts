@@ -1,5 +1,2 @@
-export { Home } from "./Home";
-export { Meet } from "./Meet";
-export { Mail } from "./Mail";
-export { Spam } from "./Spam";
-export { Settings } from "./Settings";
+export { default as Memories } from "./Memories";
+export { default as NewMemories } from "./NewMemories";

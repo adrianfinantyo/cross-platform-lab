@@ -1,15 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import reportWebVitals from "./reportWebVitals";
+import { defineCustomElements } from "@ionic/pwa-elements/loader";
+import { MemoryProvider } from "./context/MemoryContext";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <MemoryProvider>
+      <App />
+    </MemoryProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
+
+defineCustomElements(window);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
