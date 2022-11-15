@@ -5,11 +5,11 @@ import { GlobalContext } from "../context/GlobalContext";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { base64FromPath } from "@ionic/react-hooks/filesystem";
-import "./NewMemories.css";
-import { MemoryContext } from "../context/MemoryContext";
+// import { MemoryContext } from "../context/MemoryContext";
 import { useHistory } from "react-router";
 import { LoadScript, GoogleMap, Marker } from "@react-google-maps/api";
-import { APP_CONFIG, getCurrentPosition } from "../services/service";
+import { APP_CONFIG, convertBase64ToBlob, getCurrentPosition, postNewMemories } from "../services/service";
+import "./NewMemories.css";
 
 type photoType = {
   preview: string;
@@ -17,7 +17,7 @@ type photoType = {
 
 const NewMemories: React.FC = () => {
   const history = useHistory();
-  const { addMemory } = useContext(MemoryContext);
+  // const { addMemory } = useContext(MemoryContext);
   const { backButton, iosAddButton, themeButton } = useContext(GlobalContext);
   const [takenPhoto, setTakenPhoto] = React.useState<photoType>();
   const [choosenMemoryType, setChoosenMemoryType] = React.useState<"good" | "bad">("good");
@@ -52,7 +52,6 @@ const NewMemories: React.FC = () => {
     }
 
     if (!photo || !photo.webPath) {
-      console.log("return");
       return;
     }
 
@@ -67,15 +66,17 @@ const NewMemories: React.FC = () => {
       return;
     }
 
-    const fileName = new Date().getTime() + ".jpeg";
+    const fileName = new Date().getTime() + ".png";
     const base64Data = await base64FromPath(takenPhoto!.preview!);
-    await Filesystem.writeFile({
-      path: fileName,
-      data: base64Data,
-      directory: Directory.Data,
-    });
+    // await Filesystem.writeFile({
+    //   path: fileName,
+    //   data: base64Data,
+    //   directory: Directory.Data,
+    // });
+    convertBase64ToBlob(base64Data);
 
-    addMemory(fileName, enteredTitle.toString(), choosenMemoryType, base64Data, currentPosition);
+    // addMemory(fileName, enteredTitle.toString(), choosenMemoryType, base64Data, currentPosition);
+    postNewMemories(fileName, enteredTitle.toString(), choosenMemoryType, base64Data, currentPosition);
     history.length > 0 ? history.goBack() : history.replace("/memories/good");
   };
 

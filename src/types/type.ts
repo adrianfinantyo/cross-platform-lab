@@ -23,3 +23,13 @@ export type contactResApi = {
   email: string;
   avatar: string;
 };
+
+export type Memory = {
+  photo: string;
+  id: string;
+  imagePath: string;
+  title: string;
+  type: "good" | "bad";
+  base64Url?: string;
+  position: google.maps.LatLngLiteral;
+};
