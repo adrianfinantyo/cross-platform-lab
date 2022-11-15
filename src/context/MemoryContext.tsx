@@ -8,11 +8,14 @@ type Memory = {
   title: string;
   type: "good" | "bad";
   base64Url: string;
+  position: google.maps.LatLngLiteral;
 };
+
+type addMemoryType = (path: string, title: string, type: "good" | "bad", base64Data: string, position: google.maps.LatLngLiteral) => void;
 
 export const MemoryContext = createContext<{
   memories: Memory[];
-  addMemory: (path: string, title: string, type: "good" | "bad", base64Data: string) => void;
+  addMemory: addMemoryType;
   initContext: () => void;
 }>({
   memories: [],
@@ -43,19 +46,21 @@ export const MemoryProvider = (props: { children: React.ReactNode }) => {
           title: storedMemory.title,
           type: storedMemory.type,
           base64Url: "data:image/jpeg;base64," + file.data,
+          position: storedMemory.position,
         });
       }
       setMemories(loadedMemories);
     }
   }, []);
 
-  const addMemory = (path: string, title: string, type: "good" | "bad", base64Data: string) => {
+  const addMemory: addMemoryType = (path, title, type, base64Data, position) => {
     const newMemory: Memory = {
       id: Math.random().toString(),
       imagePath: path,
       title,
       type,
       base64Url: base64Data,
+      position,
     };
     setMemories([...memories, newMemory]);
   };

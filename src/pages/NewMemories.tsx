@@ -8,6 +8,8 @@ import { base64FromPath } from "@ionic/react-hooks/filesystem";
 import "./NewMemories.css";
 import { MemoryContext } from "../context/MemoryContext";
 import { useHistory } from "react-router";
+import { LoadScript, GoogleMap, Marker } from "@react-google-maps/api";
+import { APP_CONFIG, getCurrentPosition } from "../services/service";
 
 type photoType = {
   preview: string;
@@ -19,6 +21,8 @@ const NewMemories: React.FC = () => {
   const { backButton, iosAddButton, themeButton } = useContext(GlobalContext);
   const [takenPhoto, setTakenPhoto] = React.useState<photoType>();
   const [choosenMemoryType, setChoosenMemoryType] = React.useState<"good" | "bad">("good");
+  const [currentPosition, setCurrentPosition] = React.useState<google.maps.LatLngLiteral>({ lat: 0, lng: 0 });
+
   const titleRef = useRef<HTMLIonInputElement>(null);
 
   const selectMemoryTypeHandler = (event: CustomEvent) => {
@@ -30,6 +34,9 @@ const NewMemories: React.FC = () => {
     backButton.set(true);
     iosAddButton.set(false);
     themeButton.set(false);
+    getCurrentPosition().then((position) => {
+      setCurrentPosition({ lat: position.coords.latitude, lng: position.coords.longitude });
+    });
   }, []);
 
   const handleTakePhoto = async () => {
@@ -56,7 +63,7 @@ const NewMemories: React.FC = () => {
 
   const handleAddMemory = async () => {
     const enteredTitle = titleRef.current?.value;
-    if (!enteredTitle || enteredTitle.toString().trim().length === 0 || !takenPhoto || !choosenMemoryType) {
+    if (!enteredTitle || enteredTitle.toString().trim().length === 0 || !takenPhoto || !choosenMemoryType || !currentPosition) {
       return;
     }
 
@@ -68,8 +75,14 @@ const NewMemories: React.FC = () => {
       directory: Directory.Data,
     });
 
-    addMemory(fileName, enteredTitle.toString(), choosenMemoryType, base64Data);
+    addMemory(fileName, enteredTitle.toString(), choosenMemoryType, base64Data, currentPosition);
     history.length > 0 ? history.goBack() : history.replace("/memories/good");
+  };
+
+  const handleSelectPos = (event: google.maps.MapMouseEvent) => {
+    if (event.latLng?.lat() || event.latLng?.lng()) {
+      setCurrentPosition({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+    }
   };
 
   return (
@@ -97,6 +110,15 @@ const NewMemories: React.FC = () => {
             <IonSelectOption value="good">Good Memory</IonSelectOption>
             <IonSelectOption value="bad">Bad Memory</IonSelectOption>
           </IonSelect>
+        </IonCol>
+      </IonRow>
+      <IonRow>
+        <IonCol>
+          <LoadScript googleMapsApiKey={APP_CONFIG.googleApiKey}>
+            <GoogleMap mapContainerStyle={{ width: "100%", height: "50vh" }} center={currentPosition} zoom={10} onClick={handleSelectPos}>
+              <Marker position={currentPosition} />
+            </GoogleMap>
+          </LoadScript>
         </IonCol>
       </IonRow>
       <IonRow className="ion-margin-top ion-text-center">
