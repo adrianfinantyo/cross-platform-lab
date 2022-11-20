@@ -1,4 +1,17 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonFab, IonFabButton, IonGrid, IonIcon, IonImg, IonRow, isPlatform } from "@ionic/react";
+import {
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCol,
+  IonFab,
+  IonFabButton,
+  IonGrid,
+  IonIcon,
+  IonImg,
+  IonRow,
+  isPlatform,
+} from "@ionic/react";
 import { LoadScript, GoogleMap, Marker } from "@react-google-maps/api";
 import { add } from "ionicons/icons";
 import React, { useContext, useEffect, useState } from "react";
@@ -26,14 +39,7 @@ const Memories: React.FC = () => {
   const fetchMemories = async () => {
     try {
       const res = await getAllMemories(type);
-      res.memories.forEach((memories: any) => {
-        try {
-          memories.position = JSON.parse(memories.position);
-        } catch (err) {
-          memories.position = { lat: 0, lng: 0 };
-        }
-      });
-      setFilteredMemories(res.memories);
+      setFilteredMemories(res.filter((mem) => mem.type === type.toLowerCase()) as Memory[]);
     } catch (error) {
       console.log(error);
     }
@@ -58,13 +64,17 @@ const Memories: React.FC = () => {
           </IonCol>
         </IonRow>
         {filteredMemories.length > 0 ? (
-          filteredMemories.map((memory) => (
-            <IonRow key={memory.id}>
+          filteredMemories.map((memory, id) => (
+            <IonRow key={id}>
               <IonCol>
                 <IonCard className="memories-item">
-                  <IonImg className="item-img" src={`${APP_CONFIG.baseUrl}/${memory.photo}`} alt={memory.title} />
+                  <IonImg className="item-img" src={memory.photoUrl} alt={memory.title} />
                   <LoadScript googleMapsApiKey={APP_CONFIG.googleApiKey}>
-                    <GoogleMap mapContainerStyle={{ width: "100%", height: "50vh" }} center={memory.position} options={mapOptions}>
+                    <GoogleMap
+                      mapContainerStyle={{ width: "100%", height: "50vh" }}
+                      center={memory.position}
+                      options={mapOptions}
+                    >
                       <Marker position={memory.position} />
                     </GoogleMap>
                   </LoadScript>

@@ -1,6 +1,9 @@
 import { Geolocation } from "@capacitor/geolocation";
 import Geocode from "react-geocode";
 import axios from "axios";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db, storage } from "./firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const APP_CONFIG = {
   googleApiKey: "AIzaSyCgbc7hxjvdPIuNmJsIcoF4Z3ZYuWZZmLU",
@@ -18,25 +21,30 @@ export const getCurrentPosition = async () => {
   return coordinates;
 };
 
-export const postNewMemories = async (photoName: string, title: string, type: string, base64Data: string, currentPosition: google.maps.LatLngLiteral) => {
-  try {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("type", type);
-    formData.append("photo", await convertBase64ToBlob(base64Data));
-    formData.append("photoName", photoName);
-    formData.append("position", JSON.stringify(currentPosition));
-
-    const response = await axios.post(`${APP_CONFIG.baseUrl}/insert_new_memory.php`, formData);
-    console.log(response);
-  } catch (error) {
-    console.log(error);
-  }
+export const postNewMemories = async (
+  photoName: string,
+  title: string,
+  type: string,
+  base64Data: string,
+  currentPosition: google.maps.LatLngLiteral
+) => {
+  const storageRef = ref(storage, `memories/${photoName}`);
+  uploadBytes(storageRef, await convertBase64ToBlob(base64Data)).then((snapshot) => {
+    getDownloadURL(storageRef).then(async (url) => {
+      await addDoc(collection(db, "memories"), {
+        title: title,
+        type: type,
+        photoName: photoName,
+        position: currentPosition,
+        photoUrl: url,
+      });
+    });
+  });
 };
 
 export const getAllMemories = async (type: "good" | "bad") => {
-  const response = await axios.get(`${APP_CONFIG.baseUrl}/select_all_${type}_memory.php`);
-  return response.data;
+  const response = await getDocs(collection(db, "memories"));
+  return response.docs.map((doc) => doc.data());
 };
 
 export const convertBase64ToBlob = async (base64: string) => {

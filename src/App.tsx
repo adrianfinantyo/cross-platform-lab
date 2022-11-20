@@ -1,4 +1,4 @@
-import { Redirect, Route, Switch, useLocation } from "react-router-dom";
+import { Redirect, Route, Switch } from "react-router-dom";
 import {
   IonApp,
   IonBackButton,
@@ -7,12 +7,6 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
-  IonMenuButton,
-  IonMenuToggle,
   IonPage,
   IonRouterOutlet,
   IonTitle,
@@ -44,7 +38,7 @@ import "./theme/variables.css";
 import "./App.css";
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "./context/GlobalContext";
-import { sunny, moon, videocam, mail, list, warningOutline, settings, happyOutline, sadOutline, happy, sad, add } from "ionicons/icons";
+import { sunny, moon, happy, sad, add } from "ionicons/icons";
 import { TabNav } from "./components/TabNav";
 import { tabItemTypes } from "./types/type";
 import { MemoryContext } from "./context/MemoryContext";

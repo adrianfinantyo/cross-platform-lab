@@ -25,11 +25,16 @@ export type contactResApi = {
 };
 
 export type Memory = {
-  photo: string;
-  id: string;
-  imagePath: string;
-  title: string;
-  type: "good" | "bad";
-  base64Url?: string;
+  // photo: string;
+  // id: string;
+  // imagePath: string;
+  // title: string;
+  // type: "good" | "bad";
+  // base64Url?: string;
+  // position: google.maps.LatLngLiteral;
+  photoName: string;
+  photoUrl: string;
   position: google.maps.LatLngLiteral;
+  title: string;
+  type: string;
 };
